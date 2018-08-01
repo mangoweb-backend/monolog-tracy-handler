@@ -1,7 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger;
+namespace Mangoweb\MangoLogger\RemoteStorageDrivers;
 
+
+use Mangoweb\MangoLogger\RemoteStorageDriver;
 
 class NullRemoteStorageDriver implements RemoteStorageDriver
 {
