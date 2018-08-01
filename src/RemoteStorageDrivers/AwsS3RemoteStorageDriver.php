@@ -4,6 +4,7 @@ namespace Mangoweb\MangoLogger\RemoteStorageDrivers;
 
 use Mangoweb\Clock\Clock;
 use Mangoweb\MangoLogger\RemoteStorageDriver;
+use Mangoweb\MangoLogger\RemoteStorageRequestSender;
 
 
 class AwsS3RemoteStorageDriver implements RemoteStorageDriver
