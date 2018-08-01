@@ -1,8 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger;
+namespace Mangoweb\MangoLogger\RemoteStorageDrivers;
 
 use Mangoweb\Clock\Clock;
+use Mangoweb\MangoLogger\RemoteStorageDriver;
 
 
 class AwsS3RemoteStorageDriver implements RemoteStorageDriver
