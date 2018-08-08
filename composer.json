@@ -5,10 +5,11 @@
 	"license": "MIT",
 	"require": {
 		"php": "~7.1",
-		"mangoweb/sentry-logger": "~0.2.0",
 		"mangoweb/clock": "~0.2.0",
+		"mangoweb/sentry-logger": "~0.2.0",
 		"monolog/monolog": "~1.23",
-		"psr/log": "~1.0"
+		"psr/log": "~1.0",
+		"tracy/tracy": "~2.4"
 	},
 	"require-dev": {
 		"guzzlehttp/guzzle": "~6.0",
