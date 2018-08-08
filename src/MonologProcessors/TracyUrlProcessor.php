@@ -5,7 +5,7 @@ namespace Mangoweb\MangoLogger\MonologProcessors;
 use Mangoweb\MangoLogger\RemoteStorageDriver;
 
 
-class BlueScreenUploadProcessor
+class TracyUrlProcessor
 {
 	/** @var string */
 	private $localBlueScreenDirectory;
@@ -23,11 +23,13 @@ class BlueScreenUploadProcessor
 
 	public function __invoke(array $record): array
 	{
-		if (isset($record['context']['tracy_filename'], $record['context']['tracy_created'], $record['context']['tracy_url'])) {
-			if ($record['context']['tracy_created']) {
-				$localName = $record['context']['tracy_filename'];
-				$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
-				$this->remoteStorageDriver->upload($localPath);
+		if (isset($record['context']['tracy_filename']) && is_string($record['context']['tracy_filename'])) {
+			$localName = $record['context']['tracy_filename'];
+			$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
+			$remoteUrl = $this->remoteStorageDriver->getUrl($localPath);
+
+			if ($remoteUrl !== null) {
+				$record['context']['tracy_url'] = $remoteUrl;
 			}
 		}
 

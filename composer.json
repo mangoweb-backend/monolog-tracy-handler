@@ -8,7 +8,6 @@
 		"mangoweb/sentry-logger": "~0.2.0",
 		"mangoweb/clock": "~0.2.0",
 		"monolog/monolog": "~1.23",
-		"nextras/tracy-monolog-adapter": "~1.0",
 		"psr/log": "~1.0"
 	},
 	"require-dev": {
