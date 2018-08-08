@@ -1,0 +1,11 @@
+stages:
+  - test
+
+
+test:
+  stage: test
+  image: thecodingmachine/php:7.1-v1-cli
+
+  script:
+    - composer install
+    - vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src
