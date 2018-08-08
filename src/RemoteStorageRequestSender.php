@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger;
+namespace Mangoweb\MonologTracyHandler;
 
 
 interface RemoteStorageRequestSender

@@ -1,8 +1,7 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger\MonologHandlers;
+namespace Mangoweb\MonologTracyHandler;
 
-use Mangoweb\MangoLogger\RemoteStorageDriver;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Tracy;

@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger\MonologProcessors;
+namespace Mangoweb\MonologTracyHandler\MonologProcessors;
 
-use Mangoweb\MangoLogger\RemoteStorageDriver;
+use Mangoweb\MonologTracyHandler\RemoteStorageDriver;
 
 
 class TracyUrlProcessor

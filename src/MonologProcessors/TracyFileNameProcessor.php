@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger\MonologProcessors;
+namespace Mangoweb\MonologTracyHandler\MonologProcessors;
 
 
 class TracyFileNameProcessor

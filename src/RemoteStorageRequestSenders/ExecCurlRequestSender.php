@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Mangoweb\MangoLogger\RemoteStorageRequestSenders;
+namespace Mangoweb\MonologTracyHandler\RemoteStorageRequestSenders;
 
-use Mangoweb\MangoLogger\RemoteStorageRequestSender;
+use Mangoweb\MonologTracyHandler\RemoteStorageRequestSender;
 
 
 class ExecCurlRequestSender implements RemoteStorageRequestSender

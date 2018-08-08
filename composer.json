@@ -1,32 +1,20 @@
 {
-	"name": "mangoweb/mango-logger",
+	"name": "mangoweb/monolog-tracy-handler",
 	"type": "library",
-	"description": "Writes text log to STDERR, sends errors to Sentry and uploads Tracy bluescreens to AWS S3",
+	"description": "Integrates Tracy into Monolog, supports uploading Tracy bluescreens to AWS S3",
 	"license": "MIT",
 	"require": {
 		"php": "~7.1",
 		"mangoweb/clock": "~0.2.0",
-		"mangoweb/sentry-logger": "~0.2.0",
 		"monolog/monolog": "~1.23",
-		"psr/log": "~1.0",
 		"tracy/tracy": "~2.4"
 	},
 	"require-dev": {
-		"guzzlehttp/guzzle": "~6.0",
-		"nette/di": "~2.4",
-		"nette/http": "~2.4",
-		"nette/security": "~2.4",
 		"phpstan/phpstan-shim": "~0.10"
 	},
 	"autoload": {
 		"classmap": [
 			"src/"
 		]
-	},
-	"repositories": [
-		{
-			"type": "git",
-			"url": "git@mangoweb.org:_/sentry-logger.git"
-		}
-	]
+	}
 }
