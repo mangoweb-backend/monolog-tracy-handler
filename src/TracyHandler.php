@@ -42,10 +42,11 @@ class TracyHandler extends AbstractProcessingHandler
 			return;
 		}
 
+		$exception = $record['context']['exception'];
 		$localName = $record['context']['tracy_filename'];
 		$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
 
-		Tracy\Debugger::getBlueScreen()->renderToFile($record['context']['exception'], $localPath);
+		Tracy\Debugger::getBlueScreen()->renderToFile($exception, $localPath);
 		$this->remoteStorageDriver->upload($localPath);
 	}
 }
