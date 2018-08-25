@@ -5,16 +5,6 @@ namespace Mangoweb\MonologTracyHandler\MonologProcessors;
 
 class TracyFileNameProcessor
 {
-	/** @var string */
-	private $localBlueScreenDirectory;
-
-
-	public function __construct(string $localBlueScreenDirectory)
-	{
-		$this->localBlueScreenDirectory = $localBlueScreenDirectory;
-	}
-
-
 	public function __invoke(array $record): array
 	{
 		if (isset($record['context']['exception']) && $record['context']['exception'] instanceof \Throwable) {
@@ -32,22 +22,15 @@ class TracyFileNameProcessor
 	private function computeFileName(\Throwable $exception): string
 	{
 		$data = [];
-		while ($exception) {
+		for (; $exception; $exception = $exception->getPrevious()) {
 			$data[] = [
 				get_class($exception), $exception->getMessage(), $exception->getCode(), $exception->getFile(), $exception->getLine(),
 				array_map(function ($item) { unset($item['args']); return $item; }, $exception->getTrace()),
 			];
-			$exception = $exception->getPrevious();
 		}
 
+		$date = date('Y-m-d');
 		$hash = substr(md5(serialize($data)), 0, 10);
-		$dir = strtr($this->localBlueScreenDirectory . '/', '\\/', DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR);
-		foreach (new \DirectoryIterator($this->localBlueScreenDirectory) as $file) {
-			if (strpos($file->getBasename(), $hash)) {
-				return $dir . $file;
-			}
-		}
-
-		return 'exception--' . date('Y-m-d--H-i') . "--$hash.html";
+		return "exception--$date--$hash.html";
 	}
 }

@@ -7,16 +7,12 @@ use Mangoweb\MonologTracyHandler\RemoteStorageDriver;
 
 class TracyUrlProcessor
 {
-	/** @var string */
-	private $localBlueScreenDirectory;
-
 	/** @var RemoteStorageDriver */
 	private $remoteStorageDriver;
 
 
-	public function __construct(string $localBlueScreenDirectory, RemoteStorageDriver $remoteStorageDriver)
+	public function __construct(RemoteStorageDriver $remoteStorageDriver)
 	{
-		$this->localBlueScreenDirectory = $localBlueScreenDirectory;
 		$this->remoteStorageDriver = $remoteStorageDriver;
 	}
 
@@ -25,8 +21,7 @@ class TracyUrlProcessor
 	{
 		if (isset($record['context']['tracy_filename']) && is_string($record['context']['tracy_filename'])) {
 			$localName = $record['context']['tracy_filename'];
-			$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
-			$remoteUrl = $this->remoteStorageDriver->getUrl($localPath);
+			$remoteUrl = $this->remoteStorageDriver->getUrl($localName);
 
 			if ($remoteUrl !== null) {
 				$record['context']['tracy_url'] = $remoteUrl;
