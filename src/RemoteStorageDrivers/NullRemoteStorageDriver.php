@@ -7,7 +7,7 @@ use Mangoweb\MonologTracyHandler\RemoteStorageDriver;
 
 class NullRemoteStorageDriver implements RemoteStorageDriver
 {
-	public function getUrl(string $localPath): ?string
+	public function getUrl(string $localName): ?string
 	{
 		return null;
 	}

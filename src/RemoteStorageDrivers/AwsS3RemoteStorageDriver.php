@@ -41,11 +41,11 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	}
 
 
-	public function getUrl(string $localPath): string
+	public function getUrl(string $localName): string
 	{
 		$schema = $this->getUrlSchema();
 		$host = $this->getUrlHost();
-		$path = $this->getUrlPath($localPath);
+		$path = $this->getUrlPath($localName);
 		return "$schema://{$host}{$path}";
 	}
 
@@ -62,7 +62,8 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 			'X-Amz-Date' => Clock::now()->format('Ymd\THis\Z'),
 		];
 
-		$headers['Authorization'] = $this->getAuthorizationHeader($method, $this->getUrlPath($localPath), $headers, self::UNSIGNED_PAYLOAD_HASH);
+		$urlPath = $this->getUrlPath(basename($localPath));
+		$headers['Authorization'] = $this->getAuthorizationHeader($method, $urlPath, $headers, self::UNSIGNED_PAYLOAD_HASH);
 		$headers['Content-Type'] = 'text/html; charset=utf-8'; // cannot be included in the Authorization signature
 
 		$bodyStreamHandle = @fopen($localPath, 'r');
@@ -95,11 +96,10 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	}
 
 
-	private function getUrlPath(string $localPath): string
+	private function getUrlPath(string $localName): string
 	{
-		$baseName = basename($localPath);
-		$hash = hash_hmac('md5', $localPath, $this->secretKey);
-		return "/{$this->bucket}/{$this->prefix}{$baseName}--{$hash}.html";
+		$hash = hash_hmac('md5', $localName, $this->secretKey);
+		return "/{$this->bucket}/{$this->prefix}{$localName}--{$hash}.html";
 	}
 
 
