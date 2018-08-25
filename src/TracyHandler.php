@@ -38,15 +38,22 @@ class TracyHandler extends AbstractProcessingHandler
 			return;
 		}
 
-		if (is_file($record['context']['tracy_filename'])) {
-			return;
-		}
-
 		$exception = $record['context']['exception'];
 		$localName = $record['context']['tracy_filename'];
 		$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
 
+		if (is_file($localPath)) {
+			return;
+		}
+
+		$lockHandle = @fopen("$localPath.lock", 'x');
+		if ($lockHandle === false) {
+			return;
+		}
+
 		Tracy\Debugger::getBlueScreen()->renderToFile($exception, $localPath);
 		$this->remoteStorageDriver->upload($localPath);
+		fclose($lockHandle);
+		@unlink("$localPath.lock");
 	}
 }
