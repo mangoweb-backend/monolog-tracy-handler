@@ -72,7 +72,7 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		}
 
 		try {
-			$this->requestSender->sendRequest($method, $this->getUrl($localPath), $headers, $bodyStreamHandle);
+			$this->requestSender->sendRequest($method, $this->getUrl(basename($localPath)), $headers, $bodyStreamHandle);
 			return true;
 
 		} catch (\Throwable $e) {
