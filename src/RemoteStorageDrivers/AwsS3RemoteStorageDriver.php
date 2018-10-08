@@ -99,7 +99,7 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	private function getUrlPath(string $localName): string
 	{
 		$hash = hash_hmac('md5', $localName, $this->secretKey);
-		return "/{$this->bucket}/{$this->prefix}{$localName}--{$hash}.html";
+		return "/{$this->bucket}/{$this->prefix}{$hash}.html";
 	}
 
 
