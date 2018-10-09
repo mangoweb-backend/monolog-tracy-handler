@@ -52,6 +52,11 @@ class TracyProcessor
 				array_map(
 					static function (array $item): array {
 						unset($item['args']);
+
+						if (strpos($item['class'] ?? '', "\x00") !== false) {
+							unset($item['class']);
+						}
+
 						return $item;
 					},
 					$exception->getTrace()
