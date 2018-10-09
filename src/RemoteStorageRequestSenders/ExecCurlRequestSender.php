@@ -10,10 +10,14 @@ class ExecCurlRequestSender implements RemoteStorageRequestSender
 	/** @var string */
 	private $curlBinary;
 
+	/** @var bool */
+	private $async;
 
-	public function __construct(string $curlBinary = 'curl')
+
+	public function __construct(string $curlBinary = 'curl', ?bool $async = null)
 	{
 		$this->curlBinary = $curlBinary;
+		$this->async = $async ?? (PHP_SAPI !== 'cli');
 	}
 
 
@@ -39,6 +43,7 @@ class ExecCurlRequestSender implements RemoteStorageRequestSender
 		$args[] = '--data-binary';
 		$args[] = stream_get_contents($bodyStreamHandle, -1, 0);
 
-		exec(implode(' ', array_map('escapeshellarg', $args)) . ' >/dev/null 2>&1 &');
+		$asyncMarker = $this->async ? ' &' : '';
+		exec(implode(' ', array_map('escapeshellarg', $args)) . ' >/dev/null 2>&1' . $asyncMarker);
 	}
 }
