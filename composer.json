@@ -13,8 +13,8 @@
 		"phpstan/phpstan-shim": "~0.10"
 	},
 	"autoload": {
-		"classmap": [
-			"src/"
-		]
+		"psr-4": {
+			"Mangoweb\\MonologTracyHandler\\": "src/"
+		}
 	}
 }
