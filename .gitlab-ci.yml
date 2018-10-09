@@ -9,3 +9,4 @@ test:
   script:
     - composer install
     - vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src
+    - vendor/bin/tester tests/unit
