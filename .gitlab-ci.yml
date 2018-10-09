@@ -8,5 +8,5 @@ test:
 
   script:
     - composer install --no-interaction --no-suggest
-    - vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src
+    - vendor/bin/phpstan analyse
     - vendor/bin/tester tests/unit
