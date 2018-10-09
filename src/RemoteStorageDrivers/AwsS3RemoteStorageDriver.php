@@ -30,8 +30,14 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	private $requestSender;
 
 
-	public function __construct(string $region, string $bucket, string $prefix, string $accessKeyId, string $secretKey, RemoteStorageRequestSender $requestSender)
-	{
+	public function __construct(
+		string $region,
+		string $bucket,
+		string $prefix,
+		string $accessKeyId,
+		string $secretKey,
+		RemoteStorageRequestSender $requestSender
+	) {
 		$this->region = $region;
 		$this->bucket = $bucket;
 		$this->prefix = ltrim($prefix, '/');
@@ -43,15 +49,18 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 
 	public function getUrl(string $localName): string
 	{
-		$schema = $this->getUrlSchema();
 		$host = $this->getUrlHost();
 		$path = $this->getUrlPath($localName);
-		return "$schema://{$host}{$path}";
+		return "https://{$host}{$path}";
 	}
 
 
 	public function upload(string $localPath): bool
 	{
+		$localName = basename($localPath);
+		$url = $this->getUrl($localName);
+		$path = $this->getUrlPath($localName);
+
 		$method = 'PUT';
 
 		$headers = [
@@ -62,22 +71,15 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 			'X-Amz-Date' => Clock::now()->format('Ymd\THis\Z'),
 		];
 
-		$urlPath = $this->getUrlPath(basename($localPath));
-		$headers['Authorization'] = $this->getAuthorizationHeader($method, $urlPath, $headers, self::UNSIGNED_PAYLOAD_HASH);
+		$headers['Authorization'] = $this->getAuthorizationHeader($method, $path, $headers, self::UNSIGNED_PAYLOAD_HASH);
 		$headers['Content-Type'] = 'text/html; charset=utf-8'; // cannot be included in the Authorization signature
 
 		try {
-			return $this->requestSender->sendRequest($method, $this->getUrl(basename($localPath)), $headers, $localPath);
+			return $this->requestSender->sendRequest($method, $url, $headers, $localPath);
 
 		} catch (\Throwable $e) {
 			return false;
 		}
-	}
-
-
-	private function getUrlSchema(): string
-	{
-		return 'https';
 	}
 
 

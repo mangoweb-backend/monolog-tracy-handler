@@ -46,14 +46,16 @@ class TracyHandler extends AbstractProcessingHandler
 			return;
 		}
 
-		$lockHandle = @fopen("$localPath.lock", 'x');
+		$lockPath = "$localPath.lock";
+		$lockHandle = @fopen($lockPath, 'x');
 		if ($lockHandle === false) {
 			return;
 		}
 
 		Tracy\Debugger::getBlueScreen()->renderToFile($exception, $localPath);
 		$this->remoteStorageDriver->upload($localPath);
-		fclose($lockHandle);
-		@unlink("$localPath.lock");
+
+		@fclose($lockHandle);
+		@unlink($lockPath);
 	}
 }
