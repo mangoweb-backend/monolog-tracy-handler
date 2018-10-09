@@ -24,7 +24,7 @@ class ExecCurlRequestSender implements RemoteStorageRequestSender
 	/**
 	 * @param array<string, string> $headers
 	 */
-	public function sendRequest(string $method, string $url, array $headers, string $bodyFilePath): void
+	public function sendRequest(string $method, string $url, array $headers, string $bodyFilePath): bool
 	{
 		$args = [$this->curlBinary];
 
@@ -42,7 +42,12 @@ class ExecCurlRequestSender implements RemoteStorageRequestSender
 		$args[] = '--upload-file';
 		$args[] = $bodyFilePath;
 
+		$escapedArgs = array_map('escapeshellarg', $args);
 		$asyncMarker = $this->async ? ' &' : '';
-		exec(implode(' ', array_map('escapeshellarg', $args)) . ' >/dev/null 2>&1' . $asyncMarker);
+
+		$command = implode(' ', $escapedArgs) . ' >/dev/null 2>&1' . $asyncMarker;
+		exec($command, $output, $exitCode);
+
+		return $exitCode === 0;
 	}
 }

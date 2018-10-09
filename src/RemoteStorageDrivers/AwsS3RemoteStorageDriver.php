@@ -67,8 +67,7 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		$headers['Content-Type'] = 'text/html; charset=utf-8'; // cannot be included in the Authorization signature
 
 		try {
-			$this->requestSender->sendRequest($method, $this->getUrl(basename($localPath)), $headers, $localPath);
-			return true;
+			return $this->requestSender->sendRequest($method, $this->getUrl(basename($localPath)), $headers, $localPath);
 
 		} catch (\Throwable $e) {
 			return false;
