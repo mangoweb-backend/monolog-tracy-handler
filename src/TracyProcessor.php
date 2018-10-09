@@ -2,6 +2,8 @@
 
 namespace Mangoweb\MonologTracyHandler;
 
+use Mangoweb\Clock\Clock;
+
 
 class TracyProcessor
 {
@@ -59,7 +61,7 @@ class TracyProcessor
 			$exception = $exception->getPrevious();
 		}
 
-		$date = date('Y-m-d');
+		$date = Clock::today()->format('Y-m-d');
 		$hash = substr(md5(serialize($data)), 0, 10);
 		return "exception--$date--$hash.html";
 	}
