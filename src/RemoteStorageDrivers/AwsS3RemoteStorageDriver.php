@@ -66,20 +66,12 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		$headers['Authorization'] = $this->getAuthorizationHeader($method, $urlPath, $headers, self::UNSIGNED_PAYLOAD_HASH);
 		$headers['Content-Type'] = 'text/html; charset=utf-8'; // cannot be included in the Authorization signature
 
-		$bodyStreamHandle = @fopen($localPath, 'r');
-		if ($bodyStreamHandle === false) {
-			return false;
-		}
-
 		try {
-			$this->requestSender->sendRequest($method, $this->getUrl(basename($localPath)), $headers, $bodyStreamHandle);
+			$this->requestSender->sendRequest($method, $this->getUrl(basename($localPath)), $headers, $localPath);
 			return true;
 
 		} catch (\Throwable $e) {
 			return false;
-
-		} finally {
-			@fclose($bodyStreamHandle);
 		}
 	}
 

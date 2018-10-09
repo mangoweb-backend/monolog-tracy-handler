@@ -5,5 +5,5 @@ namespace Mangoweb\MonologTracyHandler;
 
 interface RemoteStorageRequestSender
 {
-	public function sendRequest(string $method, string $url, array $headers, $bodyResource): void;
+	public function sendRequest(string $method, string $url, array $headers, string $bodyFilePath): void;
 }
