@@ -4,6 +4,7 @@ namespace Mangoweb\MonologTracyHandler;
 
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Throwable;
 use Tracy;
 
 
@@ -14,6 +15,12 @@ class TracyHandler extends AbstractProcessingHandler
 
 	/** @var RemoteStorageDriver */
 	private $remoteStorageDriver;
+
+	/** @var null|string */
+	private $lastMessage;
+
+	/** @var null|array */
+	private $lastContext;
 
 
 	public function __construct(
@@ -30,7 +37,7 @@ class TracyHandler extends AbstractProcessingHandler
 
 	protected function write(array $record): void
 	{
-		if (!isset($record['context']['exception']) || !$record['context']['exception'] instanceof \Throwable) {
+		if (!isset($record['context']['exception']) || !$record['context']['exception'] instanceof Throwable) {
 			return;
 		}
 
@@ -52,10 +59,40 @@ class TracyHandler extends AbstractProcessingHandler
 			return;
 		}
 
+		$this->lastMessage = $record['message'];
+		$this->lastContext = $record['context'];
+		Tracy\Debugger::getBlueScreen()->addPanel([$this, 'renderPsrLogPanel']);
 		Tracy\Debugger::getBlueScreen()->renderToFile($exception, $localPath);
 		$this->remoteStorageDriver->upload($localPath);
 
 		@fclose($lockHandle);
 		@unlink($lockPath);
+	}
+
+
+	public function renderPsrLogPanel(?Throwable $e): ?array
+	{
+		if ($this->lastContext === null || $e !== $this->lastContext['exception']) {
+			return null;
+		}
+
+		unset($this->lastContext['tracy_filename'], $this->lastContext['tracy_url']);
+		$this->lastContext = array_filter($this->lastContext);
+
+		$messageHtml = '<h3>' . Tracy\Helpers::escapeHtml($this->lastMessage ?? '') . '</h3>';
+		$contextHtml = Tracy\Dumper::toHtml($this->lastContext, [
+			Tracy\Dumper::DEPTH => Tracy\Debugger::getBlueScreen()->maxDepth,
+			Tracy\Dumper::TRUNCATE => Tracy\Debugger::getBlueScreen()->maxLength,
+			Tracy\Dumper::LIVE => true,
+			Tracy\Dumper::LOCATION => Tracy\Dumper::LOCATION_CLASS,
+		]);
+
+		$this->lastMessage = null;
+		$this->lastContext = null;
+
+		return [
+			'tab' => 'PSR-3',
+			'panel' => "$messageHtml\n$contextHtml",
+		];
 	}
 }
