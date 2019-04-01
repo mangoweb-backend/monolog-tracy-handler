@@ -83,7 +83,6 @@ class TracyHandler extends AbstractProcessingHandler
 		$contextHtml = Tracy\Dumper::toHtml($this->lastContext, [
 			Tracy\Dumper::DEPTH => Tracy\Debugger::getBlueScreen()->maxDepth,
 			Tracy\Dumper::TRUNCATE => Tracy\Debugger::getBlueScreen()->maxLength,
-			Tracy\Dumper::LIVE => true,
 			Tracy\Dumper::LOCATION => Tracy\Dumper::LOCATION_CLASS,
 		]);
 
