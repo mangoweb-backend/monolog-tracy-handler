@@ -45,28 +45,22 @@ class TracyHandler extends AbstractProcessingHandler
 			return;
 		}
 
+		$this->lastMessage = $record['message'];
+		$this->lastContext = $record['context'];
+
 		$exception = $record['context']['exception'];
 		$localName = $record['context']['tracy_filename'];
 		$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
 
-		if (is_file($localPath)) {
-			return;
+		$blueScreen = Tracy\Debugger::getBlueScreen();
+		$blueScreen->addPanel([$this, 'renderPsrLogPanel']);
+
+		if ($blueScreen->renderToFile($exception, $localPath)) {
+			$this->remoteStorageDriver->upload($localPath);
 		}
 
-		$lockPath = "$localPath.lock";
-		$lockHandle = @fopen($lockPath, 'x');
-		if ($lockHandle === false) {
-			return;
-		}
-
-		$this->lastMessage = $record['message'];
-		$this->lastContext = $record['context'];
-		Tracy\Debugger::getBlueScreen()->addPanel([$this, 'renderPsrLogPanel']);
-		Tracy\Debugger::getBlueScreen()->renderToFile($exception, $localPath);
-		$this->remoteStorageDriver->upload($localPath);
-
-		@fclose($lockHandle);
-		@unlink($lockPath);
+		$this->lastMessage = null;
+		$this->lastContext = null;
 	}
 
 
@@ -85,9 +79,6 @@ class TracyHandler extends AbstractProcessingHandler
 			Tracy\Dumper::TRUNCATE => Tracy\Debugger::getBlueScreen()->maxLength,
 			Tracy\Dumper::LOCATION => Tracy\Dumper::LOCATION_CLASS,
 		]);
-
-		$this->lastMessage = null;
-		$this->lastContext = null;
 
 		return [
 			'tab' => 'PSR-3',

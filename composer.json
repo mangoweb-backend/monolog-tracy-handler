@@ -7,7 +7,7 @@
 		"php": "~7.1",
 		"mangoweb/clock": "~0.2.0",
 		"monolog/monolog": "~1.23",
-		"tracy/tracy": "~2.4"
+		"tracy/tracy": "~2.6"
 	},
 	"require-dev": {
 		"mockery/mockery": "~1.2",
