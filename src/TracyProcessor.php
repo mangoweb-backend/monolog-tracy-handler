@@ -3,6 +3,7 @@
 namespace Mangoweb\MonologTracyHandler;
 
 use Mangoweb\Clock\Clock;
+use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
 
 
 class TracyProcessor
@@ -11,9 +12,9 @@ class TracyProcessor
 	private $remoteStorageDriver;
 
 
-	public function __construct(RemoteStorageDriver $remoteStorageDriver)
+	public function __construct(?RemoteStorageDriver $remoteStorageDriver = null)
 	{
-		$this->remoteStorageDriver = $remoteStorageDriver;
+		$this->remoteStorageDriver = $remoteStorageDriver ?? new NullRemoteStorageDriver();
 	}
 
 

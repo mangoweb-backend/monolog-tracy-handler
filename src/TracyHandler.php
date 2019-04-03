@@ -2,6 +2,7 @@
 
 namespace Mangoweb\MonologTracyHandler;
 
+use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Throwable;
@@ -25,13 +26,13 @@ class TracyHandler extends AbstractProcessingHandler
 
 	public function __construct(
 		string $localBlueScreenDirectory,
-		RemoteStorageDriver $remoteStorageDriver,
+		?RemoteStorageDriver $remoteStorageDriver = null,
 		int $level = Logger::DEBUG,
 		bool $bubble = true
 	) {
 		parent::__construct($level, $bubble);
 		$this->localBlueScreenDirectory = $localBlueScreenDirectory;
-		$this->remoteStorageDriver = $remoteStorageDriver;
+		$this->remoteStorageDriver = $remoteStorageDriver ?? new NullRemoteStorageDriver();
 	}
 
 
