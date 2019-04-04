@@ -67,7 +67,8 @@ You can optionally configure remote storage for Tracy bluescreens.
 
 ```yaml
 services:
-    Mangoweb\MonologTracyHandler\RemoteStorageDriver:
+    monologTracyStorageDriver:
+        type: Mangoweb\MonologTracyHandler\RemoteStorageDriver
         factory: Mangoweb\MonologTracyHandler\RemoteStorageDrivers\AwsS3RemoteStorageDriver
         arguments:
             region: '...'
@@ -76,6 +77,7 @@ services:
             accessKeyId: '...'
             secretKey: '...'
 
-    Mangoweb\MonologTracyHandler\RemoteStorageRequestSender:
+    monologTracyRequestSender:
+        type: Mangoweb\MonologTracyHandler\RemoteStorageRequestSender
         factory: Mangoweb\MonologTracyHandler\RemoteStorageRequestSenders\ExecCurlRequestSender
 ```
