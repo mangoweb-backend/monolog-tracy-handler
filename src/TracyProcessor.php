@@ -4,9 +4,10 @@ namespace Mangoweb\MonologTracyHandler;
 
 use Mangoweb\Clock\Clock;
 use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
+use Monolog\Processor\ProcessorInterface;
 
 
-class TracyProcessor
+class TracyProcessor implements ProcessorInterface
 {
 	/** @var RemoteStorageDriver */
 	private $remoteStorageDriver;
