@@ -4,7 +4,7 @@
 	"description": "Integrates Tracy into Monolog, supports uploading Tracy bluescreens to AWS S3",
 	"license": "MIT",
 	"require": {
-		"php": "~7.1",
+		"php": "~7.1 || ~8.0",
 		"mangoweb/clock": "~0.2.0",
 		"monolog/monolog": "~1.24 || ~2.0",
 		"tracy/tracy": "~2.6"
