@@ -26,6 +26,12 @@ services:
             $localBlueScreenDirectory: '%kernel.logs_dir%'
         tags:
             - { name: monolog.logger }
+
+monolog:
+    handlers:
+        tracy:
+            type: service
+            id: Mangoweb\MonologTracyHandler\TracyHandler
 ```
 
 You can optionally configure remote storage for Tracy bluescreens.
