@@ -56,6 +56,10 @@ class TracyHandler extends AbstractProcessingHandler
 		$blueScreen = Tracy\Debugger::getBlueScreen();
 		$blueScreen->addPanel([$this, 'renderPsrLogPanel']);
 
+		if (!is_dir($this->localBlueScreenDirectory)) {
+			mkdir($this->localBlueScreenDirectory, 0777, true);
+		}
+
 		if ($blueScreen->renderToFile($exception, $localPath)) {
 			$this->remoteStorageDriver->upload($localPath);
 		}
