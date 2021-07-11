@@ -1,0 +1,30 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: thecodingmachine/php:7.1-v2-cli
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Debug
+        run: pwd && ls -la
+
+      - name: Install PHP dependencies Alt
+        uses: pxgamer/composer-action@master
+        with:
+          command: install --optimize-autoloader --prefer-dist
+
+#      - name: Install PHP dependencies
+#        run: composer install --no-interaction --no-suggest
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse
+
+      - name: Tester
+        run: vendor/bin/tester tests/unit
