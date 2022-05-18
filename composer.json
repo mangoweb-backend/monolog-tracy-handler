@@ -12,7 +12,7 @@
 	"require-dev": {
 		"mockery/mockery": "~1.2",
 		"nette/tester": "~2.0",
-		"phpstan/phpstan-shim": "~0.10"
+		"phpstan/phpstan": "~0.12"
 	},
 	"autoload": {
 		"psr-4": {
