@@ -75,10 +75,8 @@ class TracyHandler extends AbstractProcessingHandler
 			return null;
 		}
 
-		$this->lastContext = array_filter($this->lastContext);
-
 		$messageHtml = '<h3>' . Tracy\Helpers::escapeHtml($this->lastMessage ?? '') . '</h3>';
-		$contextHtml = Tracy\Dumper::toHtml($this->lastContext, [
+		$contextHtml = Tracy\Dumper::toHtml(array_filter($this->lastContext), [
 			Tracy\Dumper::DEPTH => Tracy\Debugger::getBlueScreen()->maxDepth,
 			Tracy\Dumper::TRUNCATE => Tracy\Debugger::getBlueScreen()->maxLength,
 			Tracy\Dumper::LOCATION => Tracy\Dumper::LOCATION_CLASS,
