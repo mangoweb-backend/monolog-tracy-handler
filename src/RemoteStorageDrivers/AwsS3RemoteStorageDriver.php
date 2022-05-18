@@ -11,39 +11,14 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 {
 	private const UNSIGNED_PAYLOAD_HASH = 'UNSIGNED-PAYLOAD';
 
-	/** @var string */
-	private $region;
-
-	/** @var string */
-	private $bucket;
-
-	/** @var string */
-	private $prefix;
-
-	/** @var string */
-	private $accessKeyId;
-
-	/** @var string */
-	private $secretKey;
-
-	/** @var RemoteStorageRequestSender */
-	private $requestSender;
-
-
 	public function __construct(
-		string $region,
-		string $bucket,
-		string $prefix,
-		string $accessKeyId,
-		string $secretKey,
-		RemoteStorageRequestSender $requestSender
+		private string $region,
+		private string $bucket,
+		private string $prefix,
+		private string $accessKeyId,
+		private string $secretKey,
+		private RemoteStorageRequestSender $requestSender
 	) {
-		$this->region = $region;
-		$this->bucket = $bucket;
-		$this->prefix = ltrim($prefix, '/');
-		$this->accessKeyId = $accessKeyId;
-		$this->secretKey = $secretKey;
-		$this->requestSender = $requestSender;
 	}
 
 
@@ -92,7 +67,8 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	private function getUrlPath(string $localName): string
 	{
 		$hash = hash_hmac('md5', $localName, $this->secretKey);
-		return "/{$this->bucket}/{$this->prefix}{$hash}.html";
+		$prefix = ltrim($this->prefix, '/');
+		return "/{$this->bucket}/{$prefix}{$hash}.html";
 	}
 
 

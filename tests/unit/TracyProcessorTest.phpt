@@ -2,10 +2,13 @@
 
 namespace MangowebTests\MonologTracyHandler;
 
+use Mangoweb\Clock\Clock;
 use Mangoweb\Clock\ClockMock;
 use Mangoweb\MonologTracyHandler\RemoteStorageDriver;
 use Mangoweb\MonologTracyHandler\TracyProcessor;
 use Mockery;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Tester\Assert;
 use Tester\TestCase;
 
@@ -33,7 +36,24 @@ use Tester\TestCase;
 			$storageDriver = Mockery::mock(RemoteStorageDriver::class);
 			$processor = new TracyProcessor($storageDriver);
 
-			Assert::same(['a' => 'b'], $processor(['a' => 'b']));
+			Assert::same(
+				[
+					'message' => 'Hello',
+					'context' => ['a' => 'b'],
+					'level' => 100,
+					'level_name' => 'DEBUG',
+					'channel' => 'app',
+					'datetime' => Clock::now(),
+					'extra' => [],
+				],
+				$processor(new LogRecord(
+					datetime: Clock::now(),
+					channel: 'app',
+					level: Level::Debug,
+					message: 'Hello',
+					context: ['a' => 'b'],
+				))->toArray(),
+			);
 		}
 
 
@@ -49,13 +69,25 @@ use Tester\TestCase;
 
 			Assert::same(
 				[
-					'a' => 'b',
+					'message' => 'Hello',
 					'context' => [
 						'exception' => $exception,
+					],
+					'level' => 100,
+					'level_name' => 'DEBUG',
+					'channel' => 'app',
+					'datetime' => Clock::now(),
+					'extra' => [
 						'tracy_filename' => 'exception--2018-10-09--b48e85fdbd.html',
 					],
 				],
-				$processor(['a' => 'b', 'context' => ['exception' => $exception]])
+				$processor(new LogRecord(
+					datetime: Clock::now(),
+					channel: 'app',
+					level: Level::Debug,
+					message: 'Hello',
+					context: ['exception' => $exception],
+				))->toArray(),
 			);
 		}
 
@@ -72,14 +104,26 @@ use Tester\TestCase;
 
 			Assert::same(
 				[
-					'a' => 'b',
+					'message' => 'Hello',
 					'context' => [
 						'exception' => $exception,
+					],
+					'level' => 100,
+					'level_name' => 'DEBUG',
+					'channel' => 'app',
+					'datetime' => Clock::now(),
+					'extra' => [
 						'tracy_filename' => 'exception--2018-10-09--96577eb4c8.html',
 						'tracy_url' => 'https://example.com/foo.html',
-					],
+					]
 				],
-				$processor(['a' => 'b', 'context' => ['exception' => $exception]])
+				$processor(new LogRecord(
+					datetime: Clock::now(),
+					channel: 'app',
+					level: Level::Debug,
+					message: 'Hello',
+					context: ['exception' => $exception],
+				))->toArray(),
 			);
 		}
 
@@ -90,15 +134,12 @@ use Tester\TestCase;
 			$reflection = new \ReflectionClass($exception);
 
 			$filePropertyReflection = $reflection->getProperty('file');
-			$filePropertyReflection->setAccessible(true);
 			$filePropertyReflection->setValue($exception, '/src/foo/bar.txt');
 
 			$linePropertyReflection = $reflection->getProperty('line');
-			$linePropertyReflection->setAccessible(true);
 			$linePropertyReflection->setValue($exception, 123);
 
 			$tracyPropertyReflection = $reflection->getProperty('trace');
-			$tracyPropertyReflection->setAccessible(true);
 			$tracyPropertyReflection->setValue($exception, array_map(
 				static function (array $frame): array {
 					$frame['file'] = strtr(str_replace(dirname(__FILE__, 3), '', $frame['file'] ?? ''), '\\', '/');
