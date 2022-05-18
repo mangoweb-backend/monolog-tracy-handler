@@ -1,12 +1,5 @@
 parameters:
-	level: 7
+	level: max
 	paths: [src]
 
 	checkMissingIterableValueType: false
-	reportUnmatchedIgnoredErrors: false
-
-	ignoreErrors:
-		-
-			message: "#^Parameter \\#1 \\$level of method Monolog\\\\Handler\\\\AbstractHandler\\:\\:__construct\\(\\) expects .+, int given\\.$#"
-			count: 1
-			path: src/TracyHandler.php
