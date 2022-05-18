@@ -4,6 +4,7 @@ namespace Mangoweb\MonologTracyHandler;
 
 use Mangoweb\Clock\Clock;
 use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
+use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 
 
@@ -19,16 +20,16 @@ class TracyProcessor implements ProcessorInterface
 	}
 
 
-	public function __invoke(array $record): array
+	public function __invoke(LogRecord $record): LogRecord
 	{
-		if (isset($record['context']['exception']) && $record['context']['exception'] instanceof \Throwable) {
-			$localName = $this->computeFileName($record['context']['exception']);
+		if (isset($record->context['exception']) && $record->context['exception'] instanceof \Throwable) {
+			$localName = $this->computeFileName($record->context['exception']);
 			$remoteUrl = $this->remoteStorageDriver->getUrl($localName);
 
-			$record['context']['tracy_filename'] = $localName;
+			$record->extra['tracy_filename'] = $localName;
 
 			if ($remoteUrl !== null) {
-				$record['context']['tracy_url'] = $remoteUrl;
+				$record->extra['tracy_url'] = $remoteUrl;
 			}
 		}
 

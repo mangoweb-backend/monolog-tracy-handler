@@ -4,7 +4,8 @@ namespace Mangoweb\MonologTracyHandler;
 
 use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Throwable;
 use Tracy;
 
@@ -27,7 +28,7 @@ class TracyHandler extends AbstractProcessingHandler
 	public function __construct(
 		string $localBlueScreenDirectory,
 		?RemoteStorageDriver $remoteStorageDriver = null,
-		int $level = Logger::DEBUG,
+		Level $level = Level::Debug,
 		bool $bubble = true
 	) {
 		parent::__construct($level, $bubble);
@@ -36,21 +37,21 @@ class TracyHandler extends AbstractProcessingHandler
 	}
 
 
-	protected function write(array $record): void
+	protected function write(LogRecord $record): void
 	{
-		if (!isset($record['context']['exception']) || !$record['context']['exception'] instanceof Throwable) {
+		if (!isset($record->context['exception']) || !$record->context['exception'] instanceof Throwable) {
 			return;
 		}
 
-		if (!isset($record['context']['tracy_filename']) || !is_string($record['context']['tracy_filename'])) {
+		if (!isset($record->extra['tracy_filename']) || !is_string($record->extra['tracy_filename'])) {
 			return;
 		}
 
-		$this->lastMessage = $record['message'];
-		$this->lastContext = $record['context'];
+		$this->lastMessage = $record->message;
+		$this->lastContext = $record->context;
 
-		$exception = $record['context']['exception'];
-		$localName = $record['context']['tracy_filename'];
+		$exception = $record->context['exception'];
+		$localName = $record->extra['tracy_filename'];
 		$localPath = "{$this->localBlueScreenDirectory}/{$localName}";
 
 		$blueScreen = Tracy\Debugger::getBlueScreen();
@@ -78,7 +79,6 @@ class TracyHandler extends AbstractProcessingHandler
 			return null;
 		}
 
-		unset($this->lastContext['tracy_filename'], $this->lastContext['tracy_url']);
 		$this->lastContext = array_filter($this->lastContext);
 
 		$messageHtml = '<h3>' . Tracy\Helpers::escapeHtml($this->lastMessage ?? '') . '</h3>';
