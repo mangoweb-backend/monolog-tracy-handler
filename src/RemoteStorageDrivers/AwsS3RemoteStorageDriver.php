@@ -96,6 +96,9 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	}
 
 
+	/**
+	 * @param array<string, string> $headers
+	 */
 	private function getAuthorizationHeader(string $method, string $path, array $headers, string $payloadHash): string
 	{
 		$credentialScope = sprintf('%s/%s/s3/aws4_request', Clock::now()->format('Ymd'), $this->region);
@@ -114,6 +117,9 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	}
 
 
+	/**
+	 * @param array<string, string> $headers
+	 */
 	private function getCanonicalRequest(string $method, string $path, array $headers, string $payloadHash): string
 	{
 		$query = '';
@@ -123,6 +129,9 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	}
 
 
+	/**
+	 * @param array<string, string> $headers
+	 */
 	private function getSignedHeaderNames(array $headers): string
 	{
 		$headerNames = array_keys($headers);
@@ -133,6 +142,9 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 	}
 
 
+	/**
+	 * @param array<string, string> $headers
+	 */
 	private function getSignedHeaderLines(array $headers): string
 	{
 		$signedHeaderLines = [];

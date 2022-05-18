@@ -69,6 +69,9 @@ class TracyHandler extends AbstractProcessingHandler
 	}
 
 
+	/**
+	 * @return ?array{tab: string, panel: string}
+	 */
 	public function renderPsrLogPanel(?Throwable $e): ?array
 	{
 		if ($this->lastContext === null || $e !== $this->lastContext['exception']) {

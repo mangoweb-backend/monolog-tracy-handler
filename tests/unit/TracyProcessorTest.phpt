@@ -41,7 +41,7 @@ use Tester\TestCase;
 		{
 			$storageDriver = Mockery::mock(RemoteStorageDriver::class);
 			$storageDriver->expects('getUrl')
-				->with('exception--2018-10-09--a602c18268.html')
+				->with('exception--2018-10-09--b48e85fdbd.html')
 				->andReturnNull();
 
 			$processor = new TracyProcessor($storageDriver);
@@ -52,7 +52,7 @@ use Tester\TestCase;
 					'a' => 'b',
 					'context' => [
 						'exception' => $exception,
-						'tracy_filename' => 'exception--2018-10-09--a602c18268.html',
+						'tracy_filename' => 'exception--2018-10-09--b48e85fdbd.html',
 					],
 				],
 				$processor(['a' => 'b', 'context' => ['exception' => $exception]])
@@ -64,7 +64,7 @@ use Tester\TestCase;
 		{
 			$storageDriver = Mockery::mock(RemoteStorageDriver::class);
 			$storageDriver->expects('getUrl')
-				->with('exception--2018-10-09--e7b223551a.html')
+				->with('exception--2018-10-09--96577eb4c8.html')
 				->andReturn('https://example.com/foo.html');
 
 			$processor = new TracyProcessor($storageDriver);
@@ -75,7 +75,7 @@ use Tester\TestCase;
 					'a' => 'b',
 					'context' => [
 						'exception' => $exception,
-						'tracy_filename' => 'exception--2018-10-09--e7b223551a.html',
+						'tracy_filename' => 'exception--2018-10-09--96577eb4c8.html',
 						'tracy_url' => 'https://example.com/foo.html',
 					],
 				],
