@@ -10,9 +10,9 @@
 		"tracy/tracy": "~2.6"
 	},
 	"require-dev": {
-		"mockery/mockery": "~1.2",
-		"nette/tester": "~2.0",
-		"phpstan/phpstan": "~1.4.10"
+		"mockery/mockery": "~1.5",
+		"nette/tester": "~2.4",
+		"phpstan/phpstan": "~1.6"
 	},
 	"autoload": {
 		"psr-4": {
