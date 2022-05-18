@@ -10,8 +10,7 @@ use Monolog\Processor\ProcessorInterface;
 
 class TracyProcessor implements ProcessorInterface
 {
-	/** @var RemoteStorageDriver */
-	private $remoteStorageDriver;
+	private RemoteStorageDriver $remoteStorageDriver;
 
 
 	public function __construct(?RemoteStorageDriver $remoteStorageDriver = null)
@@ -56,7 +55,7 @@ class TracyProcessor implements ProcessorInterface
 					static function (array $item): array {
 						unset($item['args']);
 
-						if (strpos($item['class'] ?? '', "\x00") !== false) {
+						if (str_contains($item['class'] ?? '', "\x00")) {
 							unset($item['class']);
 						}
 

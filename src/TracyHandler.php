@@ -12,17 +12,13 @@ use Tracy;
 
 class TracyHandler extends AbstractProcessingHandler
 {
-	/** @var string */
-	private $localBlueScreenDirectory;
+	private string $localBlueScreenDirectory;
 
-	/** @var RemoteStorageDriver */
-	private $remoteStorageDriver;
+	private RemoteStorageDriver $remoteStorageDriver;
 
-	/** @var null|string */
-	private $lastMessage;
+	private ?string $lastMessage = null;
 
-	/** @var null|array */
-	private $lastContext;
+	private ?array $lastContext = null;
 
 
 	public function __construct(

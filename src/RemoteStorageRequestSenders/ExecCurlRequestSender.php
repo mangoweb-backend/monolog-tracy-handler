@@ -7,11 +7,9 @@ use Mangoweb\MonologTracyHandler\RemoteStorageRequestSender;
 
 class ExecCurlRequestSender implements RemoteStorageRequestSender
 {
-	/** @var string */
-	private $curlBinary;
+	private string $curlBinary;
 
-	/** @var bool */
-	private $async;
+	private bool $async;
 
 
 	public function __construct(string $curlBinary = 'curl', ?bool $async = null)
