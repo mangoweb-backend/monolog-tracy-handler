@@ -12,24 +12,19 @@ use Tracy;
 
 class TracyHandler extends AbstractProcessingHandler
 {
-	private string $localBlueScreenDirectory;
-
-	private RemoteStorageDriver $remoteStorageDriver;
-
 	private ?string $lastMessage = null;
 
 	private ?array $lastContext = null;
 
 
 	public function __construct(
-		string $localBlueScreenDirectory,
-		?RemoteStorageDriver $remoteStorageDriver = null,
+		private string $localBlueScreenDirectory,
+		private ?RemoteStorageDriver $remoteStorageDriver = null,
 		Level $level = Level::Debug,
-		bool $bubble = true
+		bool $bubble = true,
+		private bool $removeUploads = true,
 	) {
 		parent::__construct($level, $bubble);
-		$this->localBlueScreenDirectory = $localBlueScreenDirectory;
-		$this->remoteStorageDriver = $remoteStorageDriver ?? new NullRemoteStorageDriver();
 	}
 
 
@@ -58,7 +53,12 @@ class TracyHandler extends AbstractProcessingHandler
 		}
 
 		if ($blueScreen->renderToFile($exception, $localPath)) {
-			$this->remoteStorageDriver->upload($localPath);
+			if ($this->remoteStorageDriver !== null) {
+				$uploaded = $this->remoteStorageDriver->upload($localPath);
+				if ($uploaded && $this->removeUploads) {
+					file_put_contents($localPath, 'Uploaded to remote storage.');
+				}
+			}
 		}
 
 		$this->lastMessage = null;
