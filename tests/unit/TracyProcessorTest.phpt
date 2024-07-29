@@ -128,6 +128,24 @@ use Tester\TestCase;
 		}
 
 
+		public function testFileNameParsing(): void
+		{
+			Assert::same('2018-10-09', TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.html')->format('Y-m-d'));
+
+			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8EXTRA.html'));
+			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8'));
+			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.'));
+			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.json'));
+			Assert::null(TracyProcessor::getDateFromFileName('.'));
+			Assert::null(TracyProcessor::getDateFromFileName('directory'));
+			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.htmlEXTRA'));
+			Assert::null(TracyProcessor::getDateFromFileName('EXTRAexception--2018-10-09--96577eb4c8.html'));
+
+			Assert::same('2026-03-09', TracyProcessor::getDateFromFileName('exception--2018-99-09--96577eb4c8.html')->format('Y-m-d'));
+			Assert::same('2019-01-07', TracyProcessor::getDateFromFileName('exception--2018-10-99--96577eb4c8.html')->format('Y-m-d'));
+		}
+
+
 		private function createException(): \Exception
 		{
 			$exception = new \Exception();

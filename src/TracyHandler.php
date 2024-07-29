@@ -16,6 +16,8 @@ class TracyHandler extends AbstractProcessingHandler
 
 	private ?array $lastContext = null;
 
+	private const UPLOADED_FILE_CONTENTS = 'Uploaded to remote storage.';
+
 
 	public function __construct(
 		private string $localBlueScreenDirectory,
@@ -56,9 +58,13 @@ class TracyHandler extends AbstractProcessingHandler
 			if ($this->remoteStorageDriver !== null) {
 				$uploaded = $this->remoteStorageDriver->upload($localPath);
 				if ($uploaded && $this->removeUploads) {
-					file_put_contents($localPath, 'Uploaded to remote storage.');
+					file_put_contents($localPath, self::UPLOADED_FILE_CONTENTS);
 				}
 			}
+		}
+
+		if ($this->removeUploads && $this->remoteStorageDriver !== null) {
+			$this->maybeRunGarbageCollection();
 		}
 
 		$this->lastMessage = null;
@@ -86,5 +92,34 @@ class TracyHandler extends AbstractProcessingHandler
 			'tab' => 'PSR-3',
 			'panel' => "$messageHtml\n$contextHtml",
 		];
+	}
+
+
+	private function maybeRunGarbageCollection(): void
+	{
+		if (rand(0, 100) !== 0) {
+			return;
+		}
+
+		$deleteOlderThan = new \DateTimeImmutable("-2 days");
+
+		$files = scandir($this->localBlueScreenDirectory);
+		if ($files === false) {
+			return;
+		}
+		foreach ($files as $file) {
+			$filePath = "{$this->localBlueScreenDirectory}/{$file}";
+			if (!is_file($filePath)) {
+				continue;
+			}
+
+			$date = TracyProcessor::getDateFromFileName($file);
+			if ($date !== null && $date < $deleteOlderThan) {
+				$fileContents = @file_get_contents($filePath);
+				if ($fileContents === self::UPLOADED_FILE_CONTENTS) {
+					unlink($filePath);
+				}
+			}
+		}
 	}
 }

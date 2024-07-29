@@ -72,4 +72,19 @@ class TracyProcessor implements ProcessorInterface
 		$hash = substr(md5(serialize($data)), 0, 10);
 		return "exception--$date--$hash.html";
 	}
+
+
+	public static function getDateFromFileName(string $fileName): ?\DateTimeImmutable
+	{
+		$matches = [];
+		if (!preg_match('/^exception--(?P<date>\d{4}-\d{2}-\d{2})--\w{10}\.html$/', $fileName, $matches)) {
+			return null;
+		}
+
+		$date = \DateTimeImmutable::createFromFormat('Y-m-d', $matches['date']);
+		if ($date === false) {
+			return null;
+		}
+		return $date;
+	}
 }
