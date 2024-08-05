@@ -2,6 +2,7 @@
 
 namespace Mangoweb\MonologTracyHandler;
 
+use Mangoweb\Clock\Clock;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
@@ -100,7 +101,7 @@ class TracyHandler extends AbstractProcessingHandler
 			return;
 		}
 
-		$deleteOlderThan = new \DateTimeImmutable("-2 days");
+		$deleteOlderThan = Clock::addDays(-2);
 
 		$files = scandir($this->localBlueScreenDirectory);
 		if ($files === false) {
