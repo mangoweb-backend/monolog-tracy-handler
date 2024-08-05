@@ -117,7 +117,7 @@ class TracyHandler extends AbstractProcessingHandler
 			}
 
 			if (@file_get_contents($path) === self::UPLOADED_FILE_CONTENTS) {
-				unlink($path);
+				@unlink($path);
 			}
 		}
 	}
