@@ -22,9 +22,9 @@ class TracyHandler extends AbstractProcessingHandler
 	public function __construct(
 		private string $localBlueScreenDirectory,
 		private ?RemoteStorageDriver $remoteStorageDriver = null,
+		private bool $removeUploads = true,
 		Level $level = Level::Debug,
 		bool $bubble = true,
-		private bool $removeUploads = true,
 	) {
 		parent::__construct($level, $bubble);
 	}
