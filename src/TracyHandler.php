@@ -2,7 +2,7 @@
 
 namespace Mangoweb\MonologTracyHandler;
 
-use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
+use Mangoweb\Clock\Clock;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
@@ -12,24 +12,21 @@ use Tracy;
 
 class TracyHandler extends AbstractProcessingHandler
 {
-	private string $localBlueScreenDirectory;
-
-	private RemoteStorageDriver $remoteStorageDriver;
-
 	private ?string $lastMessage = null;
 
 	private ?array $lastContext = null;
 
+	private const UPLOADED_FILE_CONTENTS = 'Uploaded to remote storage.';
+
 
 	public function __construct(
-		string $localBlueScreenDirectory,
-		?RemoteStorageDriver $remoteStorageDriver = null,
+		private string $localBlueScreenDirectory,
+		private ?RemoteStorageDriver $remoteStorageDriver = null,
+		private bool $removeUploads = true,
 		Level $level = Level::Debug,
-		bool $bubble = true
+		bool $bubble = true,
 	) {
 		parent::__construct($level, $bubble);
-		$this->localBlueScreenDirectory = $localBlueScreenDirectory;
-		$this->remoteStorageDriver = $remoteStorageDriver ?? new NullRemoteStorageDriver();
 	}
 
 
@@ -58,7 +55,16 @@ class TracyHandler extends AbstractProcessingHandler
 		}
 
 		if ($blueScreen->renderToFile($exception, $localPath)) {
-			$this->remoteStorageDriver->upload($localPath);
+			if ($this->remoteStorageDriver !== null) {
+				$uploaded = $this->remoteStorageDriver->upload($localPath);
+				if ($uploaded && $this->removeUploads) {
+					@file_put_contents($localPath, self::UPLOADED_FILE_CONTENTS);
+				}
+			}
+		}
+
+		if ($this->removeUploads && $this->remoteStorageDriver !== null) {
+			$this->maybeRunGarbageCollection();
 		}
 
 		$this->lastMessage = null;
@@ -86,5 +92,33 @@ class TracyHandler extends AbstractProcessingHandler
 			'tab' => 'PSR-3',
 			'panel' => "$messageHtml\n$contextHtml",
 		];
+	}
+
+
+	private function maybeRunGarbageCollection(): void
+	{
+		if (rand(0, 100) !== 0) {
+			return;
+		}
+
+		$deleteOlderThan = Clock::addDays(-2);
+		$files = @scandir($this->localBlueScreenDirectory);
+
+		if ($files === false) {
+			return;
+		}
+
+		foreach ($files as $file) {
+			$path = "{$this->localBlueScreenDirectory}/{$file}";
+			$date = TracyProcessor::getDateFromFileName($file);
+
+			if ($date === null || $date >= $deleteOlderThan || !is_file($path)) {
+				continue;
+			}
+
+			if (@file_get_contents($path) === self::UPLOADED_FILE_CONTENTS) {
+				@unlink($path);
+			}
+		}
 	}
 }

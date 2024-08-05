@@ -2,6 +2,8 @@
 
 namespace Mangoweb\MonologTracyHandler;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Mangoweb\Clock\Clock;
 use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
 use Monolog\LogRecord;
@@ -71,5 +73,21 @@ class TracyProcessor implements ProcessorInterface
 		$date = Clock::today()->format('Y-m-d');
 		$hash = substr(md5(serialize($data)), 0, 10);
 		return "exception--$date--$hash.html";
+	}
+
+
+	public static function getDateFromFileName(string $fileName): ?DateTimeImmutable
+	{
+		if (!preg_match('/^exception--(?<date>\d{4}-\d{2}-\d{2})--\w{10}\.html$/', $fileName, $matches)) {
+			return null;
+		}
+
+		$date = DateTimeImmutable::createFromFormat('!Y-m-d', $matches['date'], new DateTimeZone('UTC'));
+
+		if ($date === false) {
+			return null;
+		}
+
+		return $date;
 	}
 }
