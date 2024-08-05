@@ -102,8 +102,8 @@ class TracyHandler extends AbstractProcessingHandler
 		}
 
 		$deleteOlderThan = Clock::addDays(-2);
+		$files = @scandir($this->localBlueScreenDirectory);
 
-		$files = scandir($this->localBlueScreenDirectory);
 		if ($files === false) {
 			return;
 		}
