@@ -107,18 +107,17 @@ class TracyHandler extends AbstractProcessingHandler
 		if ($files === false) {
 			return;
 		}
+
 		foreach ($files as $file) {
-			$filePath = "{$this->localBlueScreenDirectory}/{$file}";
-			if (!is_file($filePath)) {
+			$path = "{$this->localBlueScreenDirectory}/{$file}";
+			$date = TracyProcessor::getDateFromFileName($file);
+
+			if ($date === null || $date >= $deleteOlderThan || !is_file($path)) {
 				continue;
 			}
 
-			$date = TracyProcessor::getDateFromFileName($file);
-			if ($date !== null && $date < $deleteOlderThan) {
-				$fileContents = @file_get_contents($filePath);
-				if ($fileContents === self::UPLOADED_FILE_CONTENTS) {
-					unlink($filePath);
-				}
+			if (@file_get_contents($path) === self::UPLOADED_FILE_CONTENTS) {
+				unlink($path);
 			}
 		}
 	}
