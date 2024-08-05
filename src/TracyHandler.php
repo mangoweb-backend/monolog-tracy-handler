@@ -58,7 +58,7 @@ class TracyHandler extends AbstractProcessingHandler
 			if ($this->remoteStorageDriver !== null) {
 				$uploaded = $this->remoteStorageDriver->upload($localPath);
 				if ($uploaded && $this->removeUploads) {
-					file_put_contents($localPath, self::UPLOADED_FILE_CONTENTS);
+					@file_put_contents($localPath, self::UPLOADED_FILE_CONTENTS);
 				}
 			}
 		}
