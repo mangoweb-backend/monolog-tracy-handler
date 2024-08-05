@@ -130,7 +130,7 @@ use Tester\TestCase;
 
 		public function testFileNameParsing(): void
 		{
-			Assert::same('2018-10-09', TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.html')->format('Y-m-d'));
+			Assert::same('2018-10-09T00:00:00+00:00', TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.html')->format('c'));
 
 			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8EXTRA.html'));
 			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8'));
@@ -141,8 +141,8 @@ use Tester\TestCase;
 			Assert::null(TracyProcessor::getDateFromFileName('exception--2018-10-09--96577eb4c8.htmlEXTRA'));
 			Assert::null(TracyProcessor::getDateFromFileName('EXTRAexception--2018-10-09--96577eb4c8.html'));
 
-			Assert::same('2026-03-09', TracyProcessor::getDateFromFileName('exception--2018-99-09--96577eb4c8.html')->format('Y-m-d'));
-			Assert::same('2019-01-07', TracyProcessor::getDateFromFileName('exception--2018-10-99--96577eb4c8.html')->format('Y-m-d'));
+			Assert::same('2026-03-09T00:00:00+00:00', TracyProcessor::getDateFromFileName('exception--2018-99-09--96577eb4c8.html')->format('c'));
+			Assert::same('2019-01-07T00:00:00+00:00', TracyProcessor::getDateFromFileName('exception--2018-10-99--96577eb4c8.html')->format('c'));
 		}
 
 
