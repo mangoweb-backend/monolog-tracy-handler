@@ -2,7 +2,6 @@
 
 namespace Mangoweb\MonologTracyHandler;
 
-use Mangoweb\MonologTracyHandler\RemoteStorageDrivers\NullRemoteStorageDriver;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
