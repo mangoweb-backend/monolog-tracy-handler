@@ -17,7 +17,8 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		private string $prefix,
 		private string $accessKeyId,
 		private string $secretKey,
-		private RemoteStorageRequestSender $requestSender
+		private RemoteStorageRequestSender $requestSender,
+		private ?string $hostOverride = null
 	) {
 	}
 
@@ -60,7 +61,7 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 
 	private function getUrlHost(): string
 	{
-		return "s3.{$this->region}.amazonaws.com";
+		return $this->hostOverride ?? "s3.{$this->region}.amazonaws.com";
 	}
 
 
