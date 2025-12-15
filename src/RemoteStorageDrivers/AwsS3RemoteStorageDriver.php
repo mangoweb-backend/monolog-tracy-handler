@@ -17,7 +17,8 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		private string $prefix,
 		private string $accessKeyId,
 		private string $secretKey,
-		private RemoteStorageRequestSender $requestSender
+		private RemoteStorageRequestSender $requestSender,
+		private bool $setAcl = true,
 	) {
 	}
 
@@ -41,10 +42,13 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		$headers = [
 			'Host' => $this->getUrlHost(),
 			'User-Agent' => 'MangoLogger',
-			'X-Amz-ACL' => 'public-read',
 			'X-Amz-Content-Sha256' => self::UNSIGNED_PAYLOAD_HASH,
 			'X-Amz-Date' => Clock::now()->format('Ymd\THis\Z'),
 		];
+
+		if ($this->setAcl) {
+			$headers['X-Amz-ACL'] = 'public-read';
+		}
 
 		$headers['Authorization'] = $this->getAuthorizationHeader($method, $path, $headers, self::UNSIGNED_PAYLOAD_HASH);
 		$headers['Content-Type'] = 'text/html; charset=utf-8'; // cannot be included in the Authorization signature

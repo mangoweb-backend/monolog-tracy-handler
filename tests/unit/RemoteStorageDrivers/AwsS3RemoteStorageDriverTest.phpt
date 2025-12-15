@@ -65,6 +65,30 @@ use Tester\TestCase;
 			Assert::true($storageDriver->upload('/src/log/exception--2018-10-09--144c575abe.html'));
 		}
 
+		public function testUploadWithoutAcl(): void
+		{
+			$requestSender = Mockery::mock(RemoteStorageRequestSender::class);
+			$requestSender->expects('sendRequest')
+				->andReturnUsing(function (string $method, string $url, array $headers, string $bodyFilePath): bool {
+					Assert::same('PUT', $method);
+					Assert::same('https://s3.eu-central-1.amazonaws.com/my-app/logs/a5ef95ed6b795b3dfed85238d3003cae.html', $url);
+					Assert::same('/src/log/exception--2018-10-09--144c575abe.html', $bodyFilePath);
+
+					Assert::count(6, $headers);
+					Assert::same('s3.eu-central-1.amazonaws.com', $headers['Host']);
+					Assert::same('MangoLogger', $headers['User-Agent']);
+					Assert::same('UNSIGNED-PAYLOAD', $headers['X-Amz-Content-Sha256']);
+					Assert::same('20181009T213200Z', $headers['X-Amz-Date']);
+					Assert::same('AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20181009/eu-central-1/s3/aws4_request, SignedHeaders=host;user-agent;x-amz-content-sha256;x-amz-date, Signature=f6911c67f86b2c8961f2933463b07a77293b5110433efe3e2cfe4d515119442f', $headers['Authorization']);
+					Assert::same('text/html; charset=utf-8', $headers['Content-Type']);
+
+					return true;
+				});
+
+			$storageDriver = $this->createStorageDriverWithoutAcl($requestSender);
+			Assert::true($storageDriver->upload('/src/log/exception--2018-10-09--144c575abe.html'));
+		}
+
 
 		private function createStorageDriver(RemoteStorageRequestSender $requestSender): AwsS3RemoteStorageDriver
 		{
@@ -75,6 +99,20 @@ use Tester\TestCase;
 				'AKIAIOSFODNN7EXAMPLE',
 				' wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
 				$requestSender
+			);
+		}
+
+
+		private function createStorageDriverWithoutAcl(RemoteStorageRequestSender $requestSender): AwsS3RemoteStorageDriver
+		{
+			return new AwsS3RemoteStorageDriver(
+				'eu-central-1',
+				'my-app',
+				'logs/',
+				'AKIAIOSFODNN7EXAMPLE',
+				' wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+				$requestSender,
+				false
 			);
 		}
 	}
