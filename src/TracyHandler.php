@@ -14,6 +14,7 @@ class TracyHandler extends AbstractProcessingHandler
 {
 	private ?string $lastMessage = null;
 
+	/** @var array<array-key, mixed>|null */
 	private ?array $lastContext = null;
 
 	private const UPLOADED_FILE_CONTENTS = 'Uploaded to remote storage.';
