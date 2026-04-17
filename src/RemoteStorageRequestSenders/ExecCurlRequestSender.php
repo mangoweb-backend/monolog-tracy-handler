@@ -68,7 +68,7 @@ class ExecCurlRequestSender implements RemoteStorageRequestSender
 	{
 		$curl = implode(' ', array_map('escapeshellarg', $args));
 		$cleanup = 'rm -f ' . escapeshellarg($tempPath);
-		$command = "($curl >/dev/null 2>&1; $cleanup) >/dev/null 2>&1 &";
+		$command = "($curl; $cleanup) >/dev/null 2>&1 &";
 		exec($command, $output, $exitCode);
 
 		return $exitCode === 0;
