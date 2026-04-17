@@ -71,9 +71,14 @@ use Tester\TestCase;
 			file_put_contents($this->bodyFile, 'overwritten');
 
 			$this->waitForFile($this->outputFile, minBytes: 1);
+			$this->waitForFile($this->pathRecordFile, minBytes: 1);
 
 			Assert::same('original-content', file_get_contents($this->outputFile));
-			Assert::notSame($this->bodyFile, file_get_contents($this->pathRecordFile));
+
+			$recordedPath = file_get_contents($this->pathRecordFile);
+			Assert::type('string', $recordedPath);
+			Assert::notSame('', $recordedPath);
+			Assert::notSame($this->bodyFile, $recordedPath);
 		}
 
 
@@ -86,9 +91,11 @@ use Tester\TestCase;
 			$sender->sendRequest('PUT', 'http://example/', [], $this->bodyFile);
 
 			$this->waitForFile($this->outputFile, minBytes: 1);
+			$this->waitForFile($this->pathRecordFile, minBytes: 1);
 
 			$tempPath = file_get_contents($this->pathRecordFile);
 			Assert::type('string', $tempPath);
+			Assert::notSame('', $tempPath);
 
 			// rm happens in the background shell after curl; give it a beat.
 			$deadline = microtime(true) + 2.0;

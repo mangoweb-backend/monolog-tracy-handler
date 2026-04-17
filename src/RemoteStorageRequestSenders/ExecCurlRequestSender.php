@@ -71,7 +71,14 @@ class ExecCurlRequestSender implements RemoteStorageRequestSender
 		$command = "($curl; $cleanup) >/dev/null 2>&1 &";
 		exec($command, $output, $exitCode);
 
-		return $exitCode === 0;
+		if ($exitCode !== 0) {
+			// Background subshell never started, so the cleanup `rm` won't run.
+			@unlink($tempPath);
+
+			return false;
+		}
+
+		return true;
 	}
 
 
