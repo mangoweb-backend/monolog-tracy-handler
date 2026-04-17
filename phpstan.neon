@@ -1,5 +1,3 @@
 parameters:
 	level: max
 	paths: [src]
-
-	checkMissingIterableValueType: false
