@@ -56,7 +56,16 @@ class TracyHandler extends AbstractProcessingHandler
 
 		if ($blueScreen->renderToFile($exception, $localPath)) {
 			if ($this->remoteStorageDriver !== null) {
-				$uploaded = $this->remoteStorageDriver->upload($localPath);
+				$uploadPath = $this->createUploadCopy($localPath) ?? $localPath;
+
+				try {
+					$uploaded = $this->remoteStorageDriver->upload($uploadPath);
+				} finally {
+					if ($uploadPath !== $localPath) {
+						@unlink($uploadPath);
+					}
+				}
+
 				if ($uploaded && $this->removeUploads) {
 					@file_put_contents($localPath, self::UPLOADED_FILE_CONTENTS);
 				}
@@ -69,6 +78,24 @@ class TracyHandler extends AbstractProcessingHandler
 
 		$this->lastMessage = null;
 		$this->lastContext = null;
+	}
+
+
+	private function createUploadCopy(string $localPath): ?string
+	{
+		$tempPath = @tempnam($this->localBlueScreenDirectory, 'upload-');
+
+		if ($tempPath === false) {
+			return null;
+		}
+
+		if (!@copy($localPath, $tempPath)) {
+			@unlink($tempPath);
+
+			return null;
+		}
+
+		return $tempPath;
 	}
 
 
