@@ -59,13 +59,15 @@ use Tester\TestCase;
 
 		public function testInvokeWithExceptionNullStorage(): void
 		{
+			$exception = $this->createException();
+			$expectedFileName = 'exception--2018-10-09--acff8ba9d4.html';
+
 			$storageDriver = Mockery::mock(RemoteStorageDriver::class);
 			$storageDriver->expects('getUrl')
-				->with('exception--2018-10-09--b48e85fdbd.html')
+				->with($expectedFileName)
 				->andReturnNull();
 
 			$processor = new TracyProcessor($storageDriver);
-			$exception = $this->createException();
 
 			Assert::same(
 				[
@@ -78,7 +80,7 @@ use Tester\TestCase;
 					'channel' => 'app',
 					'datetime' => Clock::now(),
 					'extra' => [
-						'tracy_filename' => 'exception--2018-10-09--b48e85fdbd.html',
+						'tracy_filename' => $expectedFileName,
 					],
 				],
 				$processor(new LogRecord(
@@ -94,13 +96,15 @@ use Tester\TestCase;
 
 		public function testInvokeWithExceptionStorage(): void
 		{
+			$exception = $this->createException();
+			$expectedFileName = 'exception--2018-10-09--acff8ba9d4.html';
+
 			$storageDriver = Mockery::mock(RemoteStorageDriver::class);
 			$storageDriver->expects('getUrl')
-				->with('exception--2018-10-09--96577eb4c8.html')
+				->with($expectedFileName)
 				->andReturn('https://example.com/foo.html');
 
 			$processor = new TracyProcessor($storageDriver);
-			$exception = $this->createException();
 
 			Assert::same(
 				[
@@ -113,7 +117,7 @@ use Tester\TestCase;
 					'channel' => 'app',
 					'datetime' => Clock::now(),
 					'extra' => [
-						'tracy_filename' => 'exception--2018-10-09--96577eb4c8.html',
+						'tracy_filename' => $expectedFileName,
 						'tracy_url' => 'https://example.com/foo.html',
 					]
 				],
@@ -151,21 +155,9 @@ use Tester\TestCase;
 			$exception = new \Exception();
 			$reflection = new \ReflectionClass($exception);
 
-			$filePropertyReflection = $reflection->getProperty('file');
-			$filePropertyReflection->setValue($exception, '/src/foo/bar.txt');
-
-			$linePropertyReflection = $reflection->getProperty('line');
-			$linePropertyReflection->setValue($exception, 123);
-
-			$tracyPropertyReflection = $reflection->getProperty('trace');
-			$tracyPropertyReflection->setValue($exception, array_map(
-				static function (array $frame): array {
-					$frame['file'] = strtr(str_replace(dirname(__FILE__, 3), '', $frame['file'] ?? ''), '\\', '/');
-					$frame['line'] = 123;
-					return $frame;
-				},
-				$exception->getTrace()
-			));
+			$reflection->getProperty('file')->setValue($exception, '/src/foo/bar.txt');
+			$reflection->getProperty('line')->setValue($exception, 123);
+			$reflection->getProperty('trace')->setValue($exception, []);
 
 			return $exception;
 		}
