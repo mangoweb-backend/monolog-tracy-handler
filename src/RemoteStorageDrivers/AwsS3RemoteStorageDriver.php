@@ -11,6 +11,14 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 {
 	private const UNSIGNED_PAYLOAD_HASH = 'UNSIGNED-PAYLOAD';
 
+	private readonly string $baseUrl;
+	private readonly string $hostHeader;
+
+	/**
+	 * @param string|null $endpoint Base URL (scheme + host [+ port]) of an S3-compatible endpoint,
+	 *                              e.g. "https://minio.example.com:9000" or "http://localhost:9000".
+	 *                              When null, the official AWS endpoint "https://s3.{region}.amazonaws.com" is used.
+	 */
 	public function __construct(
 		private string $region,
 		private string $bucket,
@@ -19,15 +27,33 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		private string $secretKey,
 		private RemoteStorageRequestSender $requestSender,
 		private ?AwsS3Acl $acl = null,
+		?string $endpoint = null,
 	) {
+		if ($endpoint === null) {
+			$this->baseUrl = "https://s3.{$region}.amazonaws.com";
+			$this->hostHeader = "s3.{$region}.amazonaws.com";
+		} else {
+			$endpoint = rtrim($endpoint, '/');
+			$parts = parse_url($endpoint);
+			$allowedKeys = ['scheme', 'host', 'port'];
+			if (!is_array($parts)
+				|| !isset($parts['scheme'], $parts['host'])
+				|| !in_array($parts['scheme'], ['http', 'https'], true)
+				|| array_diff(array_keys($parts), $allowedKeys) !== []
+			) {
+				throw new \InvalidArgumentException(
+					"Invalid endpoint \"$endpoint\", expected URL in the form \"scheme://host[:port]\"."
+				);
+			}
+			$this->baseUrl = $endpoint;
+			$this->hostHeader = $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
+		}
 	}
 
 
 	public function getUrl(string $localName): string
 	{
-		$host = $this->getUrlHost();
-		$path = $this->getUrlPath($localName);
-		return "https://{$host}{$path}";
+		return $this->baseUrl . $this->getUrlPath($localName);
 	}
 
 
@@ -40,7 +66,7 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		$method = 'PUT';
 
 		$headers = [
-			'Host' => $this->getUrlHost(),
+			'Host' => $this->hostHeader,
 			'User-Agent' => 'MangoLogger',
 			'X-Amz-Content-Sha256' => self::UNSIGNED_PAYLOAD_HASH,
 			'X-Amz-Date' => Clock::now()->format('Ymd\THis\Z'),
@@ -59,12 +85,6 @@ class AwsS3RemoteStorageDriver implements RemoteStorageDriver
 		} catch (\Throwable $e) {
 			return false;
 		}
-	}
-
-
-	private function getUrlHost(): string
-	{
-		return "s3.{$this->region}.amazonaws.com";
 	}
 
 
