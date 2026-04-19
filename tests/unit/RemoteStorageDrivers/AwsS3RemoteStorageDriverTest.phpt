@@ -66,6 +66,72 @@ use Tester\TestCase;
 		}
 
 
+		public function testGetUrlWithCustomEndpoint(): void
+		{
+			$requestSender = Mockery::mock(RemoteStorageRequestSender::class);
+			$storageDriver = $this->createStorageDriver($requestSender, endpoint: 'https://minio.example.com:9000');
+
+			Assert::same(
+				'https://minio.example.com:9000/my-app/logs/a5ef95ed6b795b3dfed85238d3003cae.html',
+				$storageDriver->getUrl('exception--2018-10-09--144c575abe.html')
+			);
+		}
+
+
+		public function testGetUrlWithCustomEndpointTrailingSlashIsStripped(): void
+		{
+			$requestSender = Mockery::mock(RemoteStorageRequestSender::class);
+			$storageDriver = $this->createStorageDriver($requestSender, endpoint: 'http://localhost:9000/');
+
+			Assert::same(
+				'http://localhost:9000/my-app/logs/a5ef95ed6b795b3dfed85238d3003cae.html',
+				$storageDriver->getUrl('exception--2018-10-09--144c575abe.html')
+			);
+		}
+
+
+		public function testUploadWithCustomEndpoint(): void
+		{
+			$requestSender = Mockery::mock(RemoteStorageRequestSender::class);
+			$requestSender->expects('sendRequest')
+				->andReturnUsing(function (string $method, string $url, array $headers, string $bodyFilePath): bool {
+					Assert::same('PUT', $method);
+					Assert::same('http://localhost:9000/my-app/logs/a5ef95ed6b795b3dfed85238d3003cae.html', $url);
+					Assert::same('/src/log/exception--2018-10-09--144c575abe.html', $bodyFilePath);
+
+					Assert::count(6, $headers);
+					Assert::same('localhost:9000', $headers['Host']);
+					Assert::same('MangoLogger', $headers['User-Agent']);
+					Assert::same('UNSIGNED-PAYLOAD', $headers['X-Amz-Content-Sha256']);
+					Assert::same('20181009T213200Z', $headers['X-Amz-Date']);
+					Assert::match(
+						'AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20181009/eu-central-1/s3/aws4_request, SignedHeaders=host;user-agent;x-amz-content-sha256;x-amz-date, Signature=%h%',
+						$headers['Authorization']
+					);
+					Assert::same('text/html; charset=utf-8', $headers['Content-Type']);
+
+					return true;
+				});
+
+			$storageDriver = $this->createStorageDriver($requestSender, endpoint: 'http://localhost:9000');
+			Assert::true($storageDriver->upload('/src/log/exception--2018-10-09--144c575abe.html'));
+		}
+
+
+		public function testInvalidEndpointThrows(): void
+		{
+			$requestSender = Mockery::mock(RemoteStorageRequestSender::class);
+
+			foreach (['not-a-url', 'ftp://host', 'https://host/path', 'https://host?q=1', 'https://u:p@host'] as $bad) {
+				Assert::exception(
+					fn() => $this->createStorageDriver($requestSender, endpoint: $bad),
+					\InvalidArgumentException::class,
+					"Invalid endpoint \"%a%\", expected URL in the form \"scheme://host[:port]\"."
+				);
+			}
+		}
+
+
 		public function testUploadWithAcl(): void
 		{
 			$requestSender = Mockery::mock(RemoteStorageRequestSender::class);
@@ -92,7 +158,11 @@ use Tester\TestCase;
 		}
 
 
-		private function createStorageDriver(RemoteStorageRequestSender $requestSender, ?AwsS3Acl $acl = null): AwsS3RemoteStorageDriver
+		private function createStorageDriver(
+			RemoteStorageRequestSender $requestSender,
+			?AwsS3Acl $acl = null,
+			?string $endpoint = null,
+		): AwsS3RemoteStorageDriver
 		{
 			return new AwsS3RemoteStorageDriver(
 				'eu-central-1',
@@ -102,6 +172,7 @@ use Tester\TestCase;
 				' wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
 				$requestSender,
 				$acl,
+				$endpoint,
 			);
 		}
 	}
